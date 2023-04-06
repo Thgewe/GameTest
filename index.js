@@ -37,6 +37,11 @@ const testPool6 = [
     [1, 2, 3, 4, 5],
     [5, 4, 3, 2, 1],
 ]
+const testPool7 = [
+    [5, 4, 4, 1, 1],
+    [4, 2, 1, 3, 3],
+    [3, 5, 5, 2, 2],
+]
 
 const game = new Game()
 

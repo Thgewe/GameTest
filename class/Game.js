@@ -76,8 +76,6 @@ class Game {
             // цикл, пробегающийся по всем буферам
             // currentIndex - это индекс текущего буфера с которым сравниваются остальные
             for (let currentIndex = 0; currentIndex < this.buffers.length; currentIndex++) {
-                // проверка, что текущий буфер не пуст
-                if (this.buffers[currentIndex].nums.length <= 0) continue
 
                 // Цикл, пробегающийся по буферам для сравнения с текущим
                 // compareToIndex - это индекс буфера, с которым сравнивается текущий.
@@ -86,8 +84,6 @@ class Game {
 
                     // проверка, что мы не сравниваем текущий с текущим
                     if (currentIndex === compareToIndex) continue
-                    // проверка, что сравниваемый, не пуст
-                    if (this.buffers[compareToIndex].nums.length <= 0) continue
 
                     // Проверка последнего числа текущего на равенство к последнему числу сравниваемого
                     if (lastNumInBuffer[currentIndex].num === lastNumInBuffer[compareToIndex].num) {
@@ -108,10 +104,12 @@ class Game {
                                 // Num - число, которое выдернули.
                                 // From - индекс буфера из которого выдернули число.
                                 // To - индекс буфера в который вставили выдернутое число.
-                                console.log('Num: ' + poppedNum + ' From: ' + compareToIndex + ' To: ' + currentIndex);
+                                console.log('Num: ' + poppedNum + ' From: ' + compareToIndex + ' To: ' + currentIndex, 'Line: 107');
                                 this.buffers[currentIndex].add(poppedNum);
                                 lastNumInBuffer[currentIndex].quantity++;
                                 lastNumInBuffer[compareToIndex].quantity--;
+                                // Указываем, что изменения в каком-то буфере произошли
+                                isChanged = true;
                             }
                             // Проверяем, равно или больше ли количество одинаковых элементов в конце чем matchQuantity.
                             // Если да, то вызываем метод removeMatches на текущем
@@ -119,10 +117,8 @@ class Game {
                                 this.buffers[currentIndex].removeMatches(this.matchQuantity);
                                 lastNumInBuffer[currentIndex].quantity = 0;
                                 // Вывод в консоль индекса буфера на котором вызван removeMatches
-                                console.log('RemoveMatches in buffer: ' + currentIndex)
+                                console.log('RemoveMatches in buffer: ' + currentIndex, 'Line: 120')
                             }
-                            // Указываем, что изменения в каком-то буфере произошли
-                            isChanged = true;
                         } else {
                             // Так как условие не прошло, то
                             // выдергиваем последние одинаковые числа из текущего
@@ -130,27 +126,27 @@ class Game {
                             // пока не закончатся такие числа в текущем или сравниваемый не заполнится
                             while (
                                 lastNumInBuffer[currentIndex].quantity > 0 &&
-                                this.buffers[compareToIndex].nums.length <= this.buffers[compareToIndex].length
+                                this.buffers[compareToIndex].nums.length + 1 <= this.buffers[compareToIndex].length
                             ) {
                                 const poppedNum = this.buffers[currentIndex].pop();
                                 // Вывод в консоль:
                                 // Num - число, которое выдернули.
                                 // From - индекс буфера из которого выдернули число.
                                 // To - индекс буфера в который вставили выдернутое число.
-                                console.log('Num: ' + poppedNum + ' From: ' + currentIndex + ' To: ' + compareToIndex);
+                                console.log('Num: ' + poppedNum + ' From: ' + currentIndex + ' To: ' + compareToIndex, 'Line: 136');
                                 this.buffers[compareToIndex].add(poppedNum);
                                 lastNumInBuffer[currentIndex].quantity--;
                                 lastNumInBuffer[compareToIndex].quantity++;
+                                // Указываем, что изменения в каком-то буфере произошли
+                                isChanged = true;
                             }
                             // Проверяем, равно или больше ли количество одинаковых элементов в конце чем matchQuantity.
                             // Если да, то вызываем метод removeMatches на сравниваемом
                             if (lastNumInBuffer[compareToIndex].quantity >= this.matchQuantity) {
                                 this.buffers[compareToIndex].removeMatches(this.matchQuantity);
                                 lastNumInBuffer[compareToIndex].quantity = 0;
-                                console.log('RemoveMatches in buffer: ' + compareToIndex)
+                                console.log('RemoveMatches in buffer: ' + compareToIndex, 'Line: 148')
                             }
-                            // Указываем, что изменения в каком-то буфере произошли
-                            isChanged = true;
                         }
 
                     // Если первая проверка на равенство последних чисел не прошла.
@@ -160,7 +156,7 @@ class Game {
                         // с количеством чисел в сравниваемом меньше максимальной длины сравниваемого
                         if (
                             lastNumInBuffer[currentIndex].quantity + this.buffers[compareToIndex].nums.length
-                                <= this.buffers[currentIndex].length
+                                <= this.buffers[compareToIndex].length
                         ) {
                             // Так как условие прошло, то
                             // выдергиваем последние одинаковые числа из текущего
@@ -171,28 +167,70 @@ class Game {
                                 // Num - число, которое выдернули.
                                 // From - индекс буфера из которого выдернули число.
                                 // To - индекс буфера в который вставили выдернутое число.
-                                console.log('Num: ' + poppedNum + ' From: ' + currentIndex + ' To: ' + compareToIndex);
+                                console.log('Num: ' + poppedNum + ' From: ' + currentIndex + ' To: ' + compareToIndex, 'Line: 170');
                                 this.buffers[compareToIndex].add(poppedNum);
                                 lastNumInBuffer[currentIndex].quantity--;
+                                // Указываем, что изменения в каком-то буфере произошли
+                                isChanged = true;
                             }
-                            // Указываем, что изменения в каком-то буфере произошли
-                            isChanged = true;
 
-                        // Условие не прошло => сравниваемый заполнен.
-                        // Тогда выдергиваем последнее число из текущего и сохраняем его в константу.
-                        // Потом выдергиваем число из сравниваемого и вставляем в текущий.
-                        // Потом вставляем сохраненное число в сравниваемый.
-                        } else {
-                            const poppedNumCurrent = this.buffers[currentIndex].pop();
-                            const poppedNumCompare = this.buffers[compareToIndex].pop();
-                            this.buffers[currentIndex].add(poppedNumCompare);
-                            this.buffers[compareToIndex].add(poppedNumCurrent);
+                        // Условие не прошло => сравниваемый заполнен или не вместит все одинаковые последние числа текущего.
+                        // Проверяем, что в сравниваемом осталось хотя бы 1 свободное место.
+                        // Если да, то обмениваемся последними элементами, выдергивая сперва из текущего и вставляя в сравниваемый.
+                        // Так, мы точно знаем, что последний элемент сравниваемого останется прежним.
+                        // Потом выдергиваем последний элемент сравниваемого и вставляем в текущий.
+                        // Уменьшаем количество последних элементов в текущем и сравниваемом на 1.
+                        } else if (this.buffers[compareToIndex].nums.length < this.buffers[compareToIndex].length) {
+                            // Вывод в консоль:
+                            // Exchange: индексы, между которыми происходит обмен.
+                            // NumX: первое число.
+                            // NumY: второе число.
                             console.log(
                                 'Exchange: ' + currentIndex + ' - ' + compareToIndex +
-                                ' Num1: ' + poppedNumCurrent + ' Num2: ' + poppedNumCompare
+                                ` Num${currentIndex}: ` + this.buffers[currentIndex].nums[this.buffers[currentIndex].nums.length - 1] +
+                                ` Num${compareToIndex}: ` + this.buffers[compareToIndex].nums[this.buffers[compareToIndex].nums.length - 1],
+                                'Line: 188'
                             )
+                            this.buffers[compareToIndex].add(this.buffers[currentIndex].pop());
+                            this.buffers[currentIndex].add(this.buffers[compareToIndex].pop());
+                            lastNumInBuffer[currentIndex].quantity--;
+                            lastNumInBuffer[compareToIndex].quantity--;
                             // Указываем, что изменения в каком-то буфере произошли
-                            isChanged = true;
+                            isChanged = true
+
+                        // Если предыдущее условие не прошло, значит сравниваемый полон.
+                        // Тогда проверяем, что текущий может вместить все последние одинаковые числа сравниваемого.
+                        // Если да, то перекидываем последние одинаковые числа сравниваемого в текущий
+                        // пока они не закончатся
+                        } else if (
+                            this.buffers[currentIndex].nums.length + lastNumInBuffer[compareToIndex].quantity <=
+                                this.buffers[currentIndex].length
+                        ) {
+                            while(
+                                lastNumInBuffer[compareToIndex].quantity > 0
+                            ) {
+                                const poppedNum = this.buffers[compareToIndex].pop();
+                                this.buffers[currentIndex].add(poppedNum);
+                                console.log('Num: ' + poppedNum + ' From: ' + compareToIndex + ' To: ' + currentIndex, 'Line: 214');
+                                lastNumInBuffer[compareToIndex].quantity--;
+                                // Указываем, что изменения в каком-то буфере произошли
+                                isChanged = true
+                            }
+                        }
+
+                    // Проверка на наличие последнего числа текущего в сравниваемом не прошла.
+                    // Тогда проверяем сравниваемый на пустоту.
+                    // Если сравниваемый пуст, то перекидываем все одинаковые числа в конце текущего в сравниваемый.
+                    } else if (this.buffers[compareToIndex].nums.length === 0) {
+                        while(
+                            lastNumInBuffer[currentIndex].quantity > 0
+                        ) {
+                            const poppedNum = this.buffers[currentIndex].pop();
+                            this.buffers[compareToIndex].add(poppedNum);
+                            console.log('Num: ' + poppedNum + ' From: ' + currentIndex + ' To: ' + compareToIndex, 'Line: 230');
+                            lastNumInBuffer[currentIndex].quantity--;
+                            // Указываем, что изменения в каком-то буфере произошли
+                            isChanged = true
                         }
                     }
                 }
